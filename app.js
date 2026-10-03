@@ -1,8 +1,8 @@
 // Wiring only. engine.js starts DuckDB-WASM and loads the Parquet, facets.js answers
 // the header histograms from DuckDB. The grid, its pushdown source, its statistics
 // panel and its pivot are the library's own.
-import { startEngine } from './engine.js?v=20261003b';
-import { facetProvider } from './facets.js?v=20261003b';
+import { startEngine } from './engine.js?v=20261003t';
+import { facetProvider } from './facets.js?v=20261003t';
 
 const el = (id) => document.getElementById(id);
 const { createGrid, createPushdownSource, duckdbAdapter } = LatticeGrid;
@@ -26,7 +26,7 @@ const KINDS = { pickup: 'date', hour: 'category', payment: 'category', passenger
 async function main() {
   const t0 = performance.now();
   el('status').textContent = 'Starting DuckDB-WASM and loading the Parquet…';
-  const engine = await startEngine('data/yellow-2024-01.parquet?v=20261003b');
+  const engine = await startEngine('data/yellow-2024-01.parquet?v=20261003t');
   const adapter = duckdbAdapter({ connection: engine.connection, from: 'trips' });
   const source = createPushdownSource({ adapter, pageSize: 100, aggregates: { default: 'engine' } });
   const grid = createGrid(el('grid'), {
