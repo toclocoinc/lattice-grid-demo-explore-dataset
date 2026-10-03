@@ -43,22 +43,19 @@ negative fares stay in so profiling has something to find. Reproduce:
       https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-01.parquet
     node tools/build-data.mjs
 
-## Measured (headless Chrome, `tools/measure.mjs`, Lattice Grid 1.86.1)
+## Measured (headless Chrome, `tools/measure.mjs`, Lattice Grid 1.86.2)
 
     npm install --no-save puppeteer-core
     python3 -m http.server 8622 &  node tools/measure.mjs ./shots
 
-2,964,606 rows ready in about 2.0 s (DuckDB engine from the CDN, Parquet fetched,
-table built in about 1.1 s); header histograms on all 8 columns (31, 24, 5, 11,
+2,964,606 rows ready in about 2.1 s (DuckDB engine from the CDN, Parquet fetched,
+table built in about 1.2 s); header histograms on all 8 columns (31, 24, 5, 11,
 20, 20, 20, 20 bars); the 11:00 click filters to 150,542 trips with the profile
 following it (median miles 1.52, computed by the source); a pickup-day bar
-filters to 105,012; the live pivot has 24 rows; 0 console errors, light and dark.
+filters to 105,012; the live pivot has 24 rows with the statistics panel still open and showing the source's figures (2,964,606 rows, median 1.68, max 312,722); 0 console errors and no warnings, light and dark.
 
 ## Known limitations
 
-- With the pivot on, the statistics panel (still open) has no figures, and the
-  grid logs a one-time `[lattice]` warning that a pivoted pushdown grid keeps no
-  leaf rows to profile.
 - Until the filtered total settles, `grid.rows.matchCount()` reports the loaded
   window (100 to 200 rows), not the filtered total.
 

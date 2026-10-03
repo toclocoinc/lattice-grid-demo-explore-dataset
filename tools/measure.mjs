@@ -60,6 +60,8 @@ try {
       await sleep(6000);
       r.pivot = await page.evaluate(() => ({ cols: window.__demo.grid.columns.visible().map((c) => c.id), rows: window.__demo.grid.rows.count(), pivotMode: window.__demo.grid.state ? 0 : 0,
         first: (() => { const row = window.__demo.grid.rows.get(0); return row && { group: row.groupValue, key: row.key }; })() }));
+      r.pivotPanel = await page.evaluate(() => document.querySelector('.lat-toolpanel, [class*=toolpanel]')?.textContent.slice(0, 300));
+      r.pivotProfile = await page.evaluate(async () => { const p = await window.__demo.grid.statistics.profileAsync('trip_distance'); return p && { rows: p.rows, median: p.median, max: p.max }; });
       await page.screenshot({ path: `${out}/pivot-light.png` });
     }
     await page.screenshot({ path: `${out}/${theme}.png` });
