@@ -24,32 +24,43 @@ try {
       await page.waitForFunction("[...document.querySelectorAll('.lat-facet')].every((f) => f.querySelector('.lat-facet__bar'))", { timeout: 60000 });
       const bars = await page.evaluate(() => [...document.querySelectorAll('.lat-facet')].map((f) => f.querySelectorAll('.lat-facet__bar').length));
       r.barsPerFacet = bars;
-      const before = await page.evaluate(() => window.__demo.grid.rows.count());
-      // click the 9th bar of the hour histogram (hour 8), with a real mouse click
+      const before = await page.evaluate(() => window.__demo.grid.rows.matchCount());
+      r.unfilteredProfile = await page.evaluate(async () => { const p = await window.__demo.grid.statistics.profileAsync('trip_distance'); return p && { rows: p.rows, median: p.median, max: p.max, unavailable: p.unavailable && p.unavailable.map((u) => u.figure || u.name || JSON.stringify(u)) }; });
+      // click the 11:00 bar of the hour histogram, with a real mouse click
       const facets = await page.$$('.lat-facet');
       const names = await page.evaluate(() => [...document.querySelectorAll('.lat-facet')].map((f) => (f.getAttribute('aria-label') || '')));
       r.facetLabels = names;
       const hourFacet = facets[names.findIndex((n) => /hour/i.test(n))];
-      const bar = (await hourFacet.$$('.lat-facet__bar'))[8];
+      const at = await page.evaluate(() => window.__demo.grid.facets.get('hour').bounds.buckets.findIndex((b) => b.value === '11'));
+      const bar = (await hourFacet.$$('.lat-facet__bar'))[at];
       const box = await bar.boundingBox(); console.error('click at', JSON.stringify(box));
       const t0 = Date.now();
       await page.mouse.click(box.x + box.width / 2, box.y + box.height - 1);
-      await page.waitForFunction((b) => window.__demo.grid.rows.count() !== b, { timeout: 60000 }, before);
-      r.afterClick = await page.evaluate(() => ({ filter: JSON.stringify(window.__demo.grid.filters.get()), rows: window.__demo.grid.rows.count(),
+      await page.waitForFunction((b) => { const n = window.__demo.grid.rows.matchCount(); return n > 100 && n < b; }, { timeout: 60000 }, before);
+      r.afterClick = await page.evaluate(() => ({ filter: JSON.stringify(window.__demo.grid.filters.get()), rows: window.__demo.grid.rows.matchCount(),
         hours: [...new Set(Array.from({ length: 20 }, (_, i) => window.__demo.grid.rows.get(i)).filter(Boolean).map((x) => x.data ? x.data.hour : x.hour))] }));
       r.afterClick.ms = Date.now() - t0;
       await sleep(1500);
-      r.profileAfterFilter = await page.evaluate(() => { const p = window.__demo.grid.statistics.profile('trip_distance'); return p && { rows: p.rows, median: p.median }; });
+      r.profileAfterFilter = await page.evaluate(async () => { const p = await window.__demo.grid.statistics.profileAsync('trip_distance'); return p && { rows: p.rows, median: p.median, computed: p.computed }; });
+      r.panelText = await page.evaluate(() => document.querySelector('.lat-toolpanel, [class*=toolpanel]')?.textContent.slice(0, 160));
       await page.screenshot({ path: `${out}/filtered-light.png` });
       await page.click('#clear');
-      await sleep(1500);
-      r.afterClear = await page.evaluate(() => window.__demo.grid.rows.count());
+      await page.waitForFunction((b) => window.__demo.grid.rows.matchCount() === b, { timeout: 60000 }, before);
+      r.afterClear = await page.evaluate(() => window.__demo.grid.rows.matchCount());
+      // a second click, on a pickup-date bar: the other histograms recount under it
+      const pk = (await facets[names.findIndex((n) => /pickup distribution/i.test(n))].$$('.lat-facet__bar'))[10];
+      const pb = await pk.boundingBox();
+      await page.mouse.click(pb.x + pb.width / 2, pb.y + pb.height - 1);
+      await sleep(3000);
+      r.afterDateClick = await page.evaluate(() => ({ filter: JSON.stringify(window.__demo.grid.filters.get()), rows: window.__demo.grid.rows.matchCount(),
+        hourBars: [...document.querySelectorAll('.lat-facet')][2].querySelectorAll('.lat-facet__bar').length }));
+      await page.click('#clear');
+      await sleep(2000);
       await page.click('#pivot');
       await sleep(6000);
-      r.pivot = await page.evaluate(() => ({ cols: window.__demo.grid.columns.visible().map((c) => c.id), rows: window.__demo.grid.rows.count(),
+      r.pivot = await page.evaluate(() => ({ cols: window.__demo.grid.columns.visible().map((c) => c.id), rows: window.__demo.grid.rows.count(), pivotMode: window.__demo.grid.state ? 0 : 0,
         first: (() => { const row = window.__demo.grid.rows.get(0); return row && { group: row.groupValue, key: row.key }; })() }));
       await page.screenshot({ path: `${out}/pivot-light.png` });
-      await page.click('#pivot'); await sleep(1500);
     }
     await page.screenshot({ path: `${out}/${theme}.png` });
     r.consoleErrors = errors.length; r.errors = errors; r.warnings = warnings;
