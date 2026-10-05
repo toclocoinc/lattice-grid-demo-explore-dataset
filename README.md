@@ -1,6 +1,6 @@
 # Explore a dataset you have never seen, in the browser
 
-A [Lattice Grid](https://latticegrid.dev) demo: a month of New York yellow-taxi
+A [Lattice Grid](https://www.latticegrid.dev) demo: a month of New York yellow-taxi
 trips (2,964,606 rows) loaded into DuckDB-WASM in a Web Worker in this tab, with
 the grid on a DuckDB pushdown source (`duckdbAdapter` + `createPushdownSource`):
 filters, pivot, the statistics panel's figures and the header histograms are all

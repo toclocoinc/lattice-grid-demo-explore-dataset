@@ -12,7 +12,7 @@
   // Where the library comes from. `false` loads the published release from the CDN;
   // `true` loads a local build from vendor/ instead (not part of this repository).
   const LOCAL = false;
-  const LIB = LOCAL ? 'vendor/' : 'https://cdn.jsdelivr.net/npm/@toclocoinc/lattice-grid@1.86.4/';
+  const LIB = LOCAL ? 'vendor/' : 'https://cdn.jsdelivr.net/npm/@toclocoinc/lattice-grid@1.86.7/';
   document.write('<link rel="stylesheet" href="' + LIB + 'lattice-grid.min.css">');
   document.write('<script src="' + LIB + 'lattice-grid.min.js"><' + '/script>');
 </script>
@@ -51,13 +51,13 @@
 <footer>
   Data: <a href="https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page">NYC TLC Trip Record Data</a>, yellow taxi,
   January 2024, published by the NYC Taxi &amp; Limousine Commission as open data. Reduced to eight columns by
-  <code>tools/build-data.mjs</code>. Lattice Grid <span id="version"></span> &middot; <a href="README.md">README</a>.
+  <code>tools/build-data.mjs</code>. Built with <a href="https://www.latticegrid.dev/duckdb-data-grid/">Lattice Grid</a> <span id="version"></span> &middot; <a href="README.md">README</a>.
 </footer>
 <script>
   // Bound to toclocoinc.github.io; does nothing anywhere else. localhost never needs a key.
   LatticeGrid.setLicence('LG1.eyJ2IjoxLCJwIjoibGF0dGljZS1ncmlkIiwidCI6IlRPQ0xPQ08gSW5jIC0gcHVibGljIGRlbW9zIiwiZSI6IjIwMzAtMDEtMDEiLCJkIjpbInRvY2xvY29pbmMuZ2l0aHViLmlvIl19.9De42ua3aCGpiMB6EVRP7Tv-upUlDI-0T07rlSPzvCrsqg8t4YJi7SRnStEpAg48uzmcG7il1fR_TfwkUE7iCA');
   document.getElementById('version').textContent = LatticeGrid.getVersion ? LatticeGrid.getVersion() : '';
 </script>
-<script type="module" src="app.js?v=20261003u"></script>
+<script type="module" src="app.js?v=20261005a"></script>
 </body>
 </html>
